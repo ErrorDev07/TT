@@ -3,6 +3,7 @@ const puppeteer = require('puppeteer');
 const { default: fetch } = require('node-fetch');
 const sqlite3 = require('sqlite3').verbose();
 const dayjs = require('dayjs');
+const http = require('http');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
@@ -73,6 +74,17 @@ async function login(page) {
   console.log('Login successful!');
 }
 
+
+// Create HTTP server for keep-alive
+const server = http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('Bot is alive!');
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 async function monitor() {
   console.log('Bot started');
