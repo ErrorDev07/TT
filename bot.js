@@ -21,13 +21,14 @@ db.run(`CREATE TABLE IF NOT EXISTS otps (otp TEXT, number TEXT, UNIQUE(otp, numb
 
 async function sendTelegram({ number, service, otp, message, time }) {
   const text = [
-    '📌 𝑵𝑬𝑾 𝑶𝑻𝑷 𝑹𝑬𝑪𝑬𝑰𝑽𝑬𝑫 🟢',
-    '✨ Congratulations ✨',
-    `⏰ Time: ${time}`,
-    `📞 Number: \`${number}\``,
-    `🔧 Service: ${service}`,
-    `🔑 OTP Code: \`${otp}\``,
-    `📱 Message: ${message}`
+    '� *NEW OTP RECEIVED* �',
+    '━━━━━━━━━━━━━━━',
+    `*🔐 OTP Code:* \`${otp}\``,
+    `*� Number:* \`${number}\``,
+    `*� Service:* ${service}`,
+    `*⏰ Time:* ${time}`,
+    '━━━━━━━━━━━━━━━',
+    `*� Message:*\n_${message}_`
   ].join('\n');
 
   const reply_markup = {
@@ -81,7 +82,7 @@ const server = http.createServer((req, res) => {
   res.end('Bot is alive!');
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
@@ -103,10 +104,10 @@ async function monitor() {
     console.log('Ready to monitor live SMS page.');
     // Send confirmation message to Telegram
     const confirmMsg = {
-      number: '-',
-      service: '-',
-      otp: '-',
-      message: 'Bot is online and monitoring IVASMS live SMS page.',
+      number: '✅',
+      service: '✅',
+      otp: '✅',
+      message: '🤖 Bot is now online and actively monitoring IVASMS live SMS page.',
       time: dayjs().tz('Asia/Kolkata').format('DD/MM/YYYY, HH:mm:ss')
     };
     await sendTelegram(confirmMsg);
