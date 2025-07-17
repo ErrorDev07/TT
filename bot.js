@@ -6,6 +6,23 @@ const dayjs = require('dayjs');
 const http = require('http');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// Validate required environment variables
+const requiredEnvVars = ['IVASMS_EMAIL', 'IVASMS_PASSWORD', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`Error: ${envVar} environment variable is required but not set`);
+    process.exit(1);
+  }
+}
+const sqlite3 = require('sqlite3').verbose();
+const dayjs = require('dayjs');
+const http = require('http');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
@@ -21,14 +38,15 @@ db.run(`CREATE TABLE IF NOT EXISTS otps (otp TEXT, number TEXT, UNIQUE(otp, numb
 
 async function sendTelegram({ number, service, otp, message, time }) {
   const text = [
-    '� *NEW OTP RECEIVED* �',
-    '━━━━━━━━━━━━━━━',
-    `*🔐 OTP Code:* \`${otp}\``,
-    `*� Number:* \`${number}\``,
-    `*� Service:* ${service}`,
-    `*⏰ Time:* ${time}`,
-    '━━━━━━━━━━━━━━━',
-    `*� Message:*\n_${message}_`
+    '🟢🟢🟢 OTP Received 🟢🟢🟢',
+    '',
+    `⏰ Time: \`${time}\``,
+    `☎️ Number: \`${number}\``,
+    `⚙️ Service: \`${service}\``,
+    `🐦‍🔥 OTP Code: ***${otp}***`,
+    `📱 Message: \`${message}\``,
+    '',
+    '⚙ —⟩⟩ 𝙋𝙤𝙬𝙚𝙧𝙚𝙙 𝘽𝙮 ⚡️ 𝘿𝙚𝙫 ⚡️🌏'
   ].join('\n');
 
   const reply_markup = {
@@ -90,7 +108,10 @@ server.listen(PORT, () => {
 async function monitor() {
   console.log('Bot started');
   try {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
     async function ensureLoggedIn() {
@@ -215,5 +236,17 @@ async function monitor() {
     console.error('Fatal error:', err);
   }
 }
+
+// Create HTTP server for keep-alive
+// Create HTTP server for keep-alive
+const server = http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end('Bot is alive!');
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
 
 monitor();
